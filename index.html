@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- טעינת ה-SDK של טלגרם -->
     <script src="telegram.org"></script>
     <style>
         body { font-family: sans-serif; padding: 20px; text-align: center; }
@@ -18,12 +19,12 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
+        
         document.getElementById('videoInput').onchange = async function(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            const file = files[0];
+            const file = files;
             const formData = new FormData();
             formData.append('video', file);
             formData.append('user_id', tg.initDataUnsafe.user.id);
@@ -31,8 +32,8 @@
             document.getElementById('status').innerText = "שולח סרטון לשרת...";
 
             try {
-                // !!! עדכן את הכתובת הזו בהמשך !!!
-                const response = await fetch('your-project-name.vercel.app', {
+                // הכתובת המדויקת של השרת שלך ב-Vercel
+                const response = await fetch('mybotapp-nine.vercel.app', {
                     method: 'POST',
                     body: formData
                 });
