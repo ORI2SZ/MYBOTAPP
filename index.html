@@ -4,28 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="telegram.org"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; direction: rtl; }
+        .box { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; }
+        .red { color: red; font-weight: bold; }
+        .btn-finish { background: #28a745; color: white; padding: 20px; border: none; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        input { font-size: 16px; margin: 10px 0; width: 100%; }
+    </style>
 </head>
-<body style="text-align:center; padding:20px;">
-    <h2>אימות וידאו קבוצת גייז דיבור חופשי</h2>
-    <p>הוראות: תגיד שעה, תאריך, ואת המספר <b>6869</b>.</p>
-    
-    <!-- הכפתור היחיד שפותח מצלמה ב-2026 בלי חסימות -->
-    <input type="file" accept="video/*" capture="user" id="v">
-    
-    <br><br>
-    <button id="s" style="display:none; padding:15px; background:green; color:white; width:100%;">סיימתי, שלח אישור</button>
+<body>
+
+    <div class="box">
+        <b>הנחיות לאימות (חובה):</b><br>
+        1. לחץ על הכפתור למטה ובחר ב<b>מצלמה</b>.<br>
+        2. צלם סרטון סלפי ואמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        3. ציין שעה, תאריך ואת המספר: <span class="red">6869</span>.<br>
+        4. לאחר האישור, לחץ על הכפתור הירוק <b>"שלח אישור"</b>.
+    </div>
+
+    <!-- כפתור בחירת קובץ - אם הוא לא פותח מצלמה, בחר ידנית במצלמה בתפריט שייפתח -->
+    <input type="file" id="vInput" accept="video/*" capture="user">
+
+    <br>
+
+    <!-- הכפתור הזה תמיד גלוי עכשיו, כדי שלא תהיה בעיה -->
+    <button class="btn-finish" onclick="sendToBot()">✅ לחץ כאן לשליחת האישור</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const inp = document.getElementById('v');
-        const btn = document.getElementById('s');
 
-        inp.onchange = () => { if(inp.files.length > 0) btn.style.display = 'block'; };
-        btn.onclick = () => { 
-            tg.sendData("בוצע אימות 6869"); 
-            tg.close(); 
-        };
+        function sendToBot() {
+            const input = document.getElementById('vInput');
+            if (input.files.length === 0) {
+                alert("אנא צלם או בחר סרטון קודם!");
+                return;
+            }
+            // שליחת הודעת טקסט לבוט וסגירה
+            tg.sendData("בוצע אימות וידאו 6869");
+            tg.close();
+        }
     </script>
 </body>
 </html>
