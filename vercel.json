@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/upload-video",
+      "source": "/submit-video",
       "destination": "/api/upload-video.py"
     }
   ]
