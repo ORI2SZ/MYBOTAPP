@@ -5,29 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; color: #333; }
-        .instructions { background: white; padding: 20px; border-radius: 15px; border: 2px solid #0088cc; text-align: right; }
-        .btn { background: #0088cc; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 18px; margin-top: 20px; font-weight: bold; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
+        .box { border: 2px solid #0088cc; padding: 20px; border-radius: 15px; text-align: right; margin-bottom: 20px; }
+        .btn { background: #0088cc; color: white; border: none; padding: 20px; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; }
         .red { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="instructions">
-        <h3>הנחיות לאימות וידאו:</h3>
-        1. צלם סרטון סלפי עם <span class="red">פנים גלויות</span>.<br>
-        2. אמור את <span class="red">השעה והתאריך</span>.<br>
-        3. אמור: "אימות לקבוצת <span class="red">גייז דיבור חופשי</span>".<br>
-        4. אמור את המספר: <span class="red">6869</span>.<br><br>
-        <b>לאחר שתלחץ על הכפתור למטה, צלם ושלח את הסרטון כהודעה לבוט.</b>
+
+    <div class="box">
+        <b>הנחיות לאימות:</b><br><br>
+        1. צלם סרטון סלפי בו רואים אותך.<br>
+        2. תגיד את <span class="red">השעה והתאריך</span>.<br>
+        3. תגיד: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        4. תגיד את המספר: <span class="red">6869</span>.
     </div>
-    <button class="btn" onclick="closeAndMsg()">הבנתי, אני הולך לצלם</button>
+
+    <!-- שימוש ב-input הכי פשוט שיש, בלי שום עיצוב כדי למנוע חסימות -->
+    <p>לחץ על "בחירת קובץ" ובחר במצלמה:</p>
+    <input type="file" id="v" accept="video/*" capture="user" style="display: block; width: 100%; margin: 20px 0;">
+
+    <button class="btn" id="sendBtn" style="display: none;">סיימתי, שלח אישור</button>
 
     <script>
-        function closeAndMsg() {
-            const tg = window.Telegram.WebApp;
-            tg.sendData("אני שולח עכשיו את הסרטון"); // זה רק סוגר את החלון ושולח טקסט
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const input = document.getElementById('v');
+        const btn = document.getElementById('sendBtn');
+
+        input.onchange = function() {
+            if (input.files.length > 0) {
+                btn.style.display = 'block'; // מראה את כפתור השליחה רק אחרי שנבחר סרטון
+            }
+        };
+
+        btn.onclick = function() {
+            tg.sendData("ביצעתי אימות וידאו 6869");
             tg.close();
-        }
+        };
     </script>
 </body>
 </html>
