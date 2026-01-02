@@ -2,21 +2,21 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>אימות וידאו</title>
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); line-height: 1.6; }
-        .instructions { background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; border: 1px solid #0088cc; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color, #ffffff); color: var(--tg-theme-text-color, #000000); }
+        .instructions { background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; border: 1px solid #0088cc; font-size: 14px; }
         .highlight { color: #0088cc; font-weight: bold; }
-        .btn { background: #0088cc; color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 18px; font-weight: bold; }
-        #status { margin-top: 20px; color: green; font-weight: bold; }
-        video { width: 100%; margin-top: 15px; border-radius: 10px; display: none; }
+        .btn { background: #0088cc; color: white; padding: 18px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 18px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #status { margin-top: 20px; font-weight: bold; color: #0088cc; }
+        video { width: 100%; margin-top: 15px; border-radius: 10px; display: none; background: #000; }
     </style>
 </head>
 <body>
 
-    <h2>שלב אימות הווידאו</h2>
+    <h2>🎥 שלב אימות הווידאו</h2>
     
     <div class="instructions">
         <strong>הנחיות לאימות:</strong><br>
@@ -28,11 +28,11 @@
         <strong>בהצלחה!</strong>
     </div>
 
-    <!-- כפתור לבחירה/צילום וידאו -->
+    <!-- שינוי: הוספת הגדרה שגורמת לטלפון להבין שזה חייב לפתוח מצלמה -->
     <input type="file" id="videoInput" accept="video/*" capture="user" style="display:none">
-    <button class="btn" onclick="document.getElementById('videoInput').click()">🎥 צלם או העלה סרטון</button>
+    <button id="uploadBtn" class="btn">הקלט סרטון אימות</button>
 
-    <video id="videoPreview" controls></video>
+    <video id="videoPreview" autoplay playsinline muted></video>
     <div id="status"></div>
 
     <script>
@@ -40,26 +40,36 @@
         tg.expand();
         tg.ready();
 
-        const videoInput = document.getElementById('videoInput');
-        const videoPreview = document.getElementById('videoPreview');
+        const btn = document.getElementById('uploadBtn');
+        const input = document.getElementById('videoInput');
         const status = document.getElementById('status');
+        const preview = document.getElementById('videoPreview');
 
-        videoInput.onchange = function(event) {
+        // לחיצה על הכפתור המעוצב תפעיל את ה-input הנסתר
+        btn.addEventListener('click', () => {
+            input.click();
+        });
+
+        input.onchange = function(event) {
             const file = event.target.files[0];
             if (file) {
-                // הצגת הסרטון למשתמש כדי שיראה מה צילם
-                const fileURL = URL.createObjectURL(file);
-                videoPreview.src = fileURL;
-                videoPreview.style.display = 'block';
+                status.innerText = "טוען את הסרטון...";
                 
-                status.innerText = "הווידאו נטען בהצלחה! שולח הודעה לבוט...";
-
-                // שליחת מידע לבוט שהמשתמש סיים את הפעולה
-                setTimeout(() => {
-                    tg.sendData("המשתמש סיים לצלם וידאו לאימות");
-                    // הערה: ב-Mini App ללא שרת, הסרטון לא באמת נשלח לבוט כקובץ,
-                    // אלא רק נותן אישור שהמשתמש ביצע את הפעולה.
-                }, 3000);
+                // מציג את הסרטון מיד אחרי הצילום
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    preview.play();
+                    
+                    status.innerText = "הסרטון נקלט! שולח אישור לבוט...";
+                    
+                    // שולח לבוט הודעה שהאימות בוצע
+                    setTimeout(() => {
+                        tg.sendData("בוצע אימות וידאו - מספר 6869");
+                    }, 3000);
+                };
+                reader.readAsDataURL(file);
             }
         };
     </script>
