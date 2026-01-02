@@ -6,42 +6,47 @@
     <script src="telegram.org"></script>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
-        .box { border: 2px solid #0088cc; padding: 20px; border-radius: 15px; text-align: right; margin-bottom: 20px; }
-        .btn { background: #0088cc; color: white; border: none; padding: 20px; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; }
+        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; line-height: 1.6; }
+        .btn-finish { background: #4CAF50; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; margin-top: 20px; display: none; }
         .red { color: red; font-weight: bold; }
+        #status { margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <b>הנחיות לאימות:</b><br><br>
-        1. צלם סרטון סלפי בו רואים אותך.<br>
-        2. תגיד את <span class="red">השעה והתאריך</span>.<br>
-        3. תגיד: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
-        4. תגיד את המספר: <span class="red">6869</span>.
+    <div class="instructions">
+        <h3>הנחיות לאימות וידאו 6869:</h3>
+        אנא בצע את השלבים הבאים בסרטון סלפי קצר:<br>
+        1. אמור את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
+        2. אמור: "<span class="red">אימות לקבוצת גייז דיבור חופשי</span>".<br>
+        3. אמור את המספר: <span class="red">6869</span>.<br><br>
+        לאחר הצילום, לחץ על הכפתור הירוק שיופיע.
     </div>
 
-    <!-- שימוש ב-input הכי פשוט שיש, בלי שום עיצוב כדי למנוע חסימות -->
-    <p>לחץ על "בחירת קובץ" ובחר במצלמה:</p>
-    <input type="file" id="v" accept="video/*" capture="user" style="display: block; width: 100%; margin: 20px 0;">
-
-    <button class="btn" id="sendBtn" style="display: none;">סיימתי, שלח אישור</button>
+    <!-- זהו כפתור ברירת המחדל של המכשיר, הוא תמיד עובד -->
+    <input type="file" id="videoInput" accept="video/*" capture="user" style="margin-bottom: 15px;">
+    
+    <button id="finishBtn" class="btn-finish">סיימתי את הצילום - חזור לבוט</button>
+    <div id="status"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        const input = document.getElementById('v');
-        const btn = document.getElementById('sendBtn');
+        const input = document.getElementById('videoInput');
+        const finishBtn = document.getElementById('finishBtn');
+        const status = document.getElementById('status');
 
-        input.onchange = function() {
+        input.onchange = function(e) {
             if (input.files.length > 0) {
-                btn.style.display = 'block'; // מראה את כפתור השליחה רק אחרי שנבחר סרטון
+                status.innerText = "סרטון נקלט בהצלחה.";
+                finishBtn.style.display = 'block'; // מציג את הכפתור הירוק
             }
         };
 
-        btn.onclick = function() {
-            tg.sendData("ביצעתי אימות וידאו 6869");
+        finishBtn.onclick = function() {
+            tg.sendData("סיימתי את תהליך האימות 6869");
             tg.close();
         };
     </script>
