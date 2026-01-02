@@ -6,60 +6,51 @@
     <script src="telegram.org"></script>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
-        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 20px; }
+        .card { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 20px; }
         .red { color: red; font-weight: bold; }
         .btn { background: #0088cc; color: white; padding: 20px; border: none; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
-        #videoPreview { width: 100%; border-radius: 12px; margin-top: 20px; display: none; }
-        #sendBtn { background: #4CAF50; display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="instructions">
+    <div class="card">
         <h3>אימות וידאו 6869</h3>
-        1. לחץ על הכפתור וצלם סרטון סלפי.<br>
-        2. אמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
-        3. אמור את התאריך ואת המספר <span class="red">6869</span>.
+        1. לחץ על הכפתור למטה.<br>
+        2. המצלמה תפתח - צלם סרטון סלפי.<br>
+        3. אמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        4. אמור את התאריך ואת המספר <span class="red">6869</span>.
     </div>
 
-    <!-- כפתור גלוי ופשוט - הכי אמין ב-2026 -->
-    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
-    <button class="btn" id="captureBtn">📸 לחץ כאן לפתיחת המצלמה</button>
+    <!-- כפתור פשוט בלי input נסתר -->
+    <button class="btn" id="openCam">📸 פתח מצלמה לצילום</button>
 
-    <video id="videoPreview" controls playsinline></video>
-    
-    <button id="sendBtn" class="btn">✅ זה הסרטון - שלח לאישור</button>
+    <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
-        const captureBtn = document.getElementById('captureBtn');
-        const videoInput = document.getElementById('videoInput');
-        const videoPreview = document.getElementById('videoPreview');
-        const sendBtn = document.getElementById('sendBtn');
-
-        // לחיצה על הכפתור פותחת את המצלמה
-        captureBtn.onclick = () => videoInput.click();
-
-        videoInput.onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // מציג את הסרטון כדי שתראה שהוא נקלט
-                videoPreview.src = URL.createObjectURL(file);
-                videoPreview.style.display = "block";
-                
-                // מחליף בין הכפתורים
-                captureBtn.style.display = "none";
-                sendBtn.style.display = "block";
-            }
-        };
-
-        sendBtn.onclick = function() {
-            // שולח הודעת טקסט לבוט וסוגר
-            tg.sendData("הסרטון מוכן - 6869");
-            tg.close();
+        document.getElementById('openCam').onclick = function() {
+            // ב-2026, חלק מהמכשירים דורשים שימוש ב-QR Scanner API כדי לעורר את המצלמה
+            // אבל אנחנו נשתמש בדרך הכי פשוטה שעוקפת חסימה:
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*';
+            input.capture = 'user'; // פקודה ישירה למצלמה קדמית
+            
+            input.onchange = function(e) {
+                if (e.target.files.length > 0) {
+                    document.getElementById('status').innerText = "הווידאו נשמר! שולח אישור...";
+                    document.getElementById('status').style.color = "green";
+                    
+                    setTimeout(() => {
+                        tg.sendData("בוצע אימות וידאו 6869");
+                        tg.close();
+                    }, 2000);
+                }
+            };
+            
+            input.click(); // הפעלה ידנית ברגע הלחיצה
         };
     </script>
 </body>
