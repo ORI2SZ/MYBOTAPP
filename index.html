@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אימות תמונה</title>
+    <!-- טעינת ה-SDK הרשמי של טלגרם -->
+    <script src="telegram.org"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .btn { background: #0088cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>אימות משתמש</h1>
+    <p>אנא צלם או העלה תמונה לאימות:</p>
+    
+    <input type="file" id="imageInput" accept="image/*" style="display:none">
+    <button class="btn" onclick="document.getElementById('imageInput').click()">בחר תמונה</button>
+    
+    <div id="status" style="margin-top: 20px;"></div>
+
+    <script>
+        // אתחול ה-Mini App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // פתיחת החלון למסך מלא
+
+        document.getElementById('imageInput').onchange = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('status').innerText = "שולח תמונה לאימות...";
+
+            // הכנת הנתונים לשליחה לשרת שלך
+            const formData = new FormData();
+            formData.append('photo', file);
+            formData.append('user_data', JSON.stringify(tg.initDataUnsafe)); // שליחת פרטי המשתמש מטלגרם
+
+            try {
+                // החלף את הכתובת בכתובת ה-Backend שלך
+                const response = await fetch('your-server.com', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById('status').innerText = "האימות הושלם!";
+                    setTimeout(() => tg.close(), 2000); // סגירת הבוט אחרי הצלחה
+                } else {
+                    document.getElementById('status').innerText = "שגיאה באימות.";
+                }
+            } catch (error) {
+                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
+            }
+        };
+    </script>
+</body>
+</html>
