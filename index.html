@@ -2,48 +2,52 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; direction: rtl; }
-        .box { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; color: #333; }
+        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 25px; line-height: 1.6; }
         .red { color: red; font-weight: bold; }
-        .btn-finish { background: #28a745; color: white; padding: 20px; border: none; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        input { font-size: 16px; margin: 10px 0; width: 100%; }
+        /* הכפתורים גלויים מיד כדי שלא תהיה חסימה */
+        .btn { padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-capture { background: #0088cc; color: white; }
+        .btn-finish { background: #4CAF50; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <b>הנחיות לאימות (חובה):</b><br>
-        1. לחץ על הכפתור למטה ובחר ב<b>מצלמה</b>.<br>
-        2. צלם סרטון סלפי ואמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
-        3. ציין שעה, תאריך ואת המספר: <span class="red">6869</span>.<br>
-        4. לאחר האישור, לחץ על הכפתור הירוק <b>"שלח אישור"</b>.
+    <div class="instructions">
+        <strong>הנחיות לאימות:</strong><br>
+        יש לשלוח סרטון עם <span class="red">פנים גלויות</span> בו אתה אומר:<br>
+        1. את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
+        2. שהאימות מיועד ל<span class="red">קבוצת גייז דיבור חופשי</span>.<br>
+        3. יש להגיד את המספר: <span class="red">6869</span>.<br>
+        <br>
+        <strong>בהצלחה!</strong>
     </div>
 
-    <!-- כפתור בחירת קובץ - אם הוא לא פותח מצלמה, בחר ידנית במצלמה בתפריט שייפתח -->
-    <input type="file" id="vInput" accept="video/*" capture="user">
-
-    <br>
-
-    <!-- הכפתור הזה תמיד גלוי עכשיו, כדי שלא תהיה בעיה -->
-    <button class="btn-finish" onclick="sendToBot()">✅ לחץ כאן לשליחת האישור</button>
+    <!-- הכפתור האפור שפותח את המצלמה/גלריה -->
+    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
+    
+    <button class="btn btn-capture" onclick="document.getElementById('videoInput').click()">📸 צלם / בחר סרטון</button>
+    <button id="finishBtn" class="btn btn-finish" style="display: none;">✅ סיימתי, שלח אישור לבוט</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        function sendToBot() {
-            const input = document.getElementById('vInput');
-            if (input.files.length === 0) {
-                alert("אנא צלם או בחר סרטון קודם!");
-                return;
-            }
-            // שליחת הודעת טקסט לבוט וסגירה
+        const input = document.getElementById('videoInput');
+        const finishBtn = document.getElementById('finishBtn');
+
+        // מראה את הכפתור הירוק רק אחרי שצילמת
+        input.onchange = () => { if (input.files.length > 0) finishBtn.style.display = 'block'; };
+
+        // שליחת הודעת טקסט לבוט (הדרך היחידה לשלוח נתונים מה-Mini App)
+        finishBtn.onclick = () => {
             tg.sendData("בוצע אימות וידאו 6869");
             tg.close();
-        }
+        };
     </script>
 </body>
 </html>
