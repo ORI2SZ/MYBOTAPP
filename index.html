@@ -3,51 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- טעינת ה-SDK של טלגרם -->
     <script src="telegram.org"></script>
     <style>
         body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .btn { padding: 15px; width: 100%; }
+        .box { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; }
+        .red { color: red; font-weight: bold; }
+        .btn-finish { background: #0088cc; color: white; padding: 20px; border: none; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h3>אימות וידאו 6869</h3>
-    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
-    <button class="btn" onclick="document.getElementById('videoInput').click()">📸 צלם או בחר סרטון</button>
-    <div id="status" style="margin-top: 15px;"></div>
+    <div class="box">
+        <b>הנחיות לאימות (חובה):</b><br>
+        1. צלם סרטון סלפי ואמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        2. ציין שעה, תאריך ואת המספר <span class="red">6869</span>.<br>
+        <br>
+        **לאחר שתלחץ על הכפתור למטה, צלם ושלח את הסרטון כהודעה רגילה בצא'ט.**
+    </div>
+    <button class="btn-finish" onclick="closeAndMsg()">הבנתי, אני הולך לצלם עכשיו</button>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        
-        document.getElementById('videoInput').onchange = async function(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            const file = files;
-            const formData = new FormData();
-            formData.append('video', file);
-            formData.append('user_id', tg.initDataUnsafe.user.id);
-
-            document.getElementById('status').innerText = "שולח סרטון לשרת...";
-
-            try {
-                // הכתובת המדויקת של השרת שלך ב-Vercel עם הנתיב החדש
-                const response = await fetch('mybotapp-nine.vercel.app', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    document.getElementById('status').innerText = "הסרטון נשלח בהצלחה!";
-                    tg.close();
-                } else {
-                    document.getElementById('status').innerText = "שגיאה בשליחה.";
-                }
-            } catch (error) {
-                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
-            }
-        };
+        function closeAndMsg() {
+            const tg = window.Telegram.WebApp;
+            tg.sendData("המשתמש מתחיל אימות ידני"); // שולח רק טקסט
+            tg.close(); // סוגר את החלון
+        }
     </script>
 </body>
 </html>
