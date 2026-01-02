@@ -2,32 +2,39 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
-        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; line-height: 1.6; }
-        .btn-finish { background: #4CAF50; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; margin-top: 20px; display: none; }
-        .red { color: red; font-weight: bold; }
-        #status { margin-top: 15px; font-weight: bold; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color, #ffffff); color: var(--tg-theme-text-color, #222222); }
+        .instructions { background: rgba(0, 136, 204, 0.1); border: 2px solid #0088cc; border-radius: 12px; padding: 15px; text-align: right; margin-bottom: 25px; line-height: 1.5; }
+        .red { color: #d32f2f; font-weight: bold; }
+        /* הכפתור המעוצב שלך */
+        .btn-main { background-color: #0088cc; color: white; border: none; border-radius: 10px; padding: 18px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; display: block; }
+        .btn-success { background-color: #4CAF50; display: none; }
+        /* החבאת הכפתור המכוער של המערכת אבל השארתו נגיש טכנית */
+        #videoInput { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 60px; cursor: pointer; }
+        .button-wrapper { position: relative; width: 100%; overflow: hidden; }
     </style>
 </head>
 <body>
 
     <div class="instructions">
         <h3>הנחיות לאימות וידאו 6869:</h3>
-        אנא בצע את השלבים הבאים בסרטון סלפי קצר:<br>
-        1. אמור את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
-        2. אמור: "<span class="red">אימות לקבוצת גייז דיבור חופשי</span>".<br>
-        3. אמור את המספר: <span class="red">6869</span>.<br><br>
-        לאחר הצילום, לחץ על הכפתור הירוק שיופיע.
+        יש לצלם סרטון סלפי בו אתה אומר:<br>
+        1. את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
+        2. שהאימות מיועד ל<span class="red">קבוצת גייז דיבור חופשי</span>.<br>
+        3. את המספר: <span class="red">6869</span>.<br><br>
+        <b>בהצלחה!</b>
     </div>
 
-    <!-- זהו כפתור ברירת המחדל של המכשיר, הוא תמיד עובד -->
-    <input type="file" id="videoInput" accept="video/*" capture="user" style="margin-bottom: 15px;">
-    
-    <button id="finishBtn" class="btn-finish">סיימתי את הצילום - חזור לבוט</button>
-    <div id="status"></div>
+    <div class="button-wrapper">
+        <!-- הכפתור המעוצב נמצא "מתחת" ל-input השקוף כדי שהלחיצה תעבור -->
+        <button id="visualBtn" class="btn-main">🎥 צלם סרטון אימות</button>
+        <input type="file" id="videoInput" accept="video/*" capture="user">
+    </div>
+
+    <button id="finishBtn" class="btn-main btn-success" style="margin-top: 20px;">✅ סיימתי, חזור לבוט</button>
+    <div id="status" style="margin-top: 15px; font-weight: bold;"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -35,18 +42,20 @@
         tg.ready();
 
         const input = document.getElementById('videoInput');
+        const visualBtn = document.getElementById('visualBtn');
         const finishBtn = document.getElementById('finishBtn');
         const status = document.getElementById('status');
 
-        input.onchange = function(e) {
+        input.onchange = function() {
             if (input.files.length > 0) {
-                status.innerText = "סרטון נקלט בהצלחה.";
-                finishBtn.style.display = 'block'; // מציג את הכפתור הירוק
+                status.innerText = "הווידאו נקלט!";
+                visualBtn.style.display = 'none'; // מחביא את כפתור הצילום
+                finishBtn.style.display = 'block'; // מראה את כפתור הסיום הירוק
             }
         };
 
         finishBtn.onclick = function() {
-            tg.sendData("סיימתי את תהליך האימות 6869");
+            tg.sendData("בוצע אימות וידאו 6869");
             tg.close();
         };
     </script>
