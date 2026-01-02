@@ -2,51 +2,50 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; color: #333; }
-        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 25px; line-height: 1.6; }
-        .red { color: red; font-weight: bold; }
-        /* הכפתורים גלויים מיד כדי שלא תהיה חסימה */
-        .btn { padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .btn-capture { background: #0088cc; color: white; }
-        .btn-finish { background: #4CAF50; color: white; }
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .btn { padding: 15px; width: 100%; }
     </style>
 </head>
 <body>
-
-    <div class="instructions">
-        <strong>הנחיות לאימות:</strong><br>
-        יש לשלוח סרטון עם <span class="red">פנים גלויות</span> בו אתה אומר:<br>
-        1. את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
-        2. שהאימות מיועד ל<span class="red">קבוצת גייז דיבור חופשי</span>.<br>
-        3. יש להגיד את המספר: <span class="red">6869</span>.<br>
-        <br>
-        <strong>בהצלחה!</strong>
-    </div>
-
-    <!-- הכפתור האפור שפותח את המצלמה/גלריה -->
+    <h3>אימות וידאו 6869</h3>
     <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
-    
-    <button class="btn btn-capture" onclick="document.getElementById('videoInput').click()">📸 צלם / בחר סרטון</button>
-    <button id="finishBtn" class="btn btn-finish" style="display: none;">✅ סיימתי, שלח אישור לבוט</button>
+    <button class="btn" onclick="document.getElementById('videoInput').click()">📸 צלם או בחר סרטון</button>
+    <div id="status" style="margin-top: 15px;"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+        
+        document.getElementById('videoInput').onchange = async function(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
-        const input = document.getElementById('videoInput');
-        const finishBtn = document.getElementById('finishBtn');
+            const file = files[0];
+            const formData = new FormData();
+            formData.append('video', file);
+            formData.append('user_id', tg.initDataUnsafe.user.id); // שליחת מזהה המשתמש
 
-        // מראה את הכפתור הירוק רק אחרי שצילמת
-        input.onchange = () => { if (input.files.length > 0) finishBtn.style.display = 'block'; };
+            document.getElementById('status').innerText = "שולח סרטון לשרת...";
 
-        // שליחת הודעת טקסט לבוט (הדרך היחידה לשלוח נתונים מה-Mini App)
-        finishBtn.onclick = () => {
-            tg.sendData("בוצע אימות וידאו 6869");
-            tg.close();
+            try {
+                // !!! החלף את הכתובת הבאה לכתובת השרת שלך !!!
+                const response = await fetch('your-server-url.com', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById('status').innerText = "הסרטון נשלח בהצלחה!";
+                    tg.close();
+                } else {
+                    document.getElementById('status').innerText = "שגיאה בשליחה.";
+                }
+            } catch (error) {
+                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
+            }
         };
     </script>
 </body>
