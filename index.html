@@ -5,28 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .box { border: 2px solid #0088cc; padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; }
-        .red { color: red; font-weight: bold; }
-        .btn-finish { background: #0088cc; color: white; padding: 20px; border: none; border-radius: 10px; width: 100%; font-size: 20px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        body { font-family: sans-serif; padding: 20px; text-align: right; }
+        .group-list { margin-bottom: 20px; }
+        .group-item { margin-bottom: 10px; }
+        input[type="checkbox"] { margin-left: 10px; }
+        .btn { padding: 15px; width: 100%; }
+        #status { margin-top: 15px; text-align: center; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <b>הנחיות לאימות (חובה):</b><br>
-        1. צלם סרטון סלפי ואמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
-        2. ציין שעה, תאריך ואת המספר <span class="red">6869</span>.<br>
-        <br>
-        **לאחר שתלחץ על הכפתור למטה, צלם ושלח את הסרטון כהודעה רגילה בצא'ט.**
+    <h3>בחר קבוצות לאימות:</h3>
+    
+    <div class="group-list">
+        <div class="group-item">
+            <input type="checkbox" id="group1" name="groups" value="ישבנים חטובים" checked>
+            <label for="group1">הישבנים החטובים של הבוס הגדול</label>
+        </div>
+        <div class="group-item">
+            <input type="checkbox" id="group2" name="groups" value="הכרויות דובים" checked>
+            <label for="group2">הכרויות דובים של הבוס הגדול</label>
+        </div>
+        <div class="group-item">
+            <input type="checkbox" id="group3" name="groups" value="גייז ישראל" checked>
+            <label for="group3">גייז ישראל של הבוס הגדול</label>
+        </div>
+        <div class="group-item">
+            <input type="checkbox" id="group4" name="groups" value="גברים מרכז-צפון-דרום" checked>
+            <label for="group4">גברים במרכז בצפון ובדרום</label>
+        </div>
+        <div class="group-item">
+            <input type="checkbox" id="group5" name="groups" value="הכרויות גייז" checked>
+            <label for="group5">הכרויות גייז של הבוס הגדול</label>
+        </div>
     </div>
-    <button class="btn-finish" onclick="closeAndMsg()">הבנתי, אני הולך לצלם עכשיו</button>
+
+    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
+    <button class="btn" onclick="document.getElementById('videoInput').click()">📸 צלם או בחר סרטון</button>
+    <div id="status"></div>
 
     <script>
-        function closeAndMsg() {
-            const tg = window.Telegram.WebApp;
-            tg.sendData("המשתמש מתחיל אימות ידני"); // שולח רק טקסט
-            tg.close(); // סוגר את החלון
-        }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        document.getElementById('videoInput').onchange = async function(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            // אסוף את הקבוצות הנבחרות
+            const selectedGroups = Array.from(document.querySelectorAll('input[name="groups"]:checked'))
+                                        .map(cb => cb.value)
+                                        .join(', ');
+            
+            const file = files;
+            const formData = new FormData();
+            formData.append('video', file);
+            formData.append('user_id', tg.initDataUnsafe.user.id);
+            formData.append('groups', selectedGroups); // הוספת הקבוצות הנבחרות לנתונים
+
+            document.getElementById('status').innerText = "שולח סרטון לשרת...";
+
+            try {
+                // הכתובת של השרת שלך ב-Vercel
+                const response = await fetch('mybotapp-nine.vercel.app', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById('status').innerText = "הסרטון נשלח בהצלחה!";
+                    tg.close();
+                } else {
+                    document.getElementById('status').innerText = "שגיאה בשליחה.";
+                }
+            } catch (error) {
+                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
+            }
+        };
     </script>
 </body>
 </html>
