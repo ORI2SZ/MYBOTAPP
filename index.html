@@ -5,67 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; color: #333; }
-        .card { border: 2px solid #0088cc; border-radius: 15px; padding: 15px; text-align: right; margin-bottom: 20px; }
-        .red { color: #d32f2f; font-weight: bold; }
-        
-        /* אזור הכפתור */
-        .btn-container { position: relative; width: 100%; height: 60px; overflow: hidden; margin-top: 20px; }
-        .visual-btn { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0088cc; color: white; border: none; border-radius: 10px;
-            font-size: 18px; font-weight: bold; z-index: 1; pointer-events: none;
-        }
-        /* ה-input השקוף שיושב מעל הכל */
-        #videoInput { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; z-index: 2; cursor: pointer;
-        }
-        .success-btn { 
-            background: #4CAF50; color: white; border: none; border-radius: 10px;
-            padding: 15px; width: 100%; font-size: 18px; font-weight: bold;
-            display: none; margin-top: 20px;
-        }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
+        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 20px; }
+        .red { color: red; font-weight: bold; }
+        .btn { background: #0088cc; color: white; padding: 20px; border: none; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
+        #videoPreview { width: 100%; border-radius: 12px; margin-top: 20px; display: none; }
+        #sendBtn { background: #4CAF50; display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h3>אימות וידאו לקבוצה</h3>
-        1. צלם סרטון סלפי עם <span class="red">פנים גלויות</span>.<br>
-        2. אמור את <span class="red">השעה והתאריך</span>.<br>
-        3. אמור: "אימות ל<span class="red">גייז דיבור חופשי</span>".<br>
-        4. אמור בבירור את המספר: <span class="red">6869</span>.
+    <div class="instructions">
+        <h3>אימות וידאו 6869</h3>
+        1. לחץ על הכפתור וצלם סרטון סלפי.<br>
+        2. אמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        3. אמור את התאריך ואת המספר <span class="red">6869</span>.
     </div>
 
-    <div class="btn-container">
-        <button class="visual-btn">🎥 לחץ לצילום הווידאו</button>
-        <input type="file" id="videoInput" accept="video/*" capture="user">
-    </div>
+    <!-- כפתור גלוי ופשוט - הכי אמין ב-2026 -->
+    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
+    <button class="btn" id="captureBtn">📸 לחץ כאן לפתיחת המצלמה</button>
 
-    <button id="finishBtn" class="success-btn">✅ סיימתי, שלח אישור</button>
-    <div id="status" style="margin-top: 15px; font-weight: bold; color: #0088cc;"></div>
+    <video id="videoPreview" controls playsinline></video>
+    
+    <button id="sendBtn" class="btn">✅ זה הסרטון - שלח לאישור</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        const input = document.getElementById('videoInput');
-        const finishBtn = document.getElementById('finishBtn');
-        const status = document.getElementById('status');
+        const captureBtn = document.getElementById('captureBtn');
+        const videoInput = document.getElementById('videoInput');
+        const videoPreview = document.getElementById('videoPreview');
+        const sendBtn = document.getElementById('sendBtn');
 
-        input.onchange = function() {
-            if (input.files && input.files.length > 0) {
-                status.innerText = "הווידאו נשמר במכשיר!";
-                document.querySelector('.btn-container').style.display = 'none';
-                finishBtn.style.display = 'block';
+        // לחיצה על הכפתור פותחת את המצלמה
+        captureBtn.onclick = () => videoInput.click();
+
+        videoInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // מציג את הסרטון כדי שתראה שהוא נקלט
+                videoPreview.src = URL.createObjectURL(file);
+                videoPreview.style.display = "block";
+                
+                // מחליף בין הכפתורים
+                captureBtn.style.display = "none";
+                sendBtn.style.display = "block";
             }
         };
 
-        finishBtn.onclick = function() {
-            // שליחת הודעת טקסט לבוט כשהמשתמש מסיים
-            tg.sendData("ביצעתי אימות וידאו 6869 - אני שולח את הסרטון עכשיו");
+        sendBtn.onclick = function() {
+            // שולח הודעת טקסט לבוט וסוגר
+            tg.sendData("הסרטון מוכן - 6869");
             tg.close();
         };
     </script>
