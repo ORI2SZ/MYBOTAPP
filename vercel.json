@@ -1,4 +1,10 @@
 {
+  "builds": [
+    {
+      "src": "api/upload-video.py",
+      "use": "@vercel/python"
+    }
+  ],
   "rewrites": [
     {
       "source": "/upload-video",
