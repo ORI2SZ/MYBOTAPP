@@ -2,55 +2,29 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="telegram.org"></script>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; color: #333; }
-        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 25px; line-height: 1.6; }
-        .red { color: #d32f2f; font-weight: bold; }
-        .btn-finish { background: #4CAF50; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; display: none; margin-top: 20px; }
-        input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px; background: #f9f9f9; }
-    </style>
 </head>
-<body>
-
-    <div class="instructions">
-        <strong>הנחיות לאימות:</strong><br>
-        יש לשלוח סרטון עם <span class="red">פנים גלויות</span> בו אתה אומר:<br>
-        1. את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
-        2. שהאימות מיועד ל<span class="red">קבוצת גייז דיבור חופשי</span>.<br>
-        3. יש להגיד את המספר: <span class="red">6869</span>.<br>
-        <br>
-        <strong>בהצלחה!</strong>
-    </div>
-
-    <p>לחץ על הכפתור למטה ובחר ב"מצלמה":</p>
+<body style="text-align:center; padding:20px;">
+    <h2>אימות וידאו קבוצת גייז דיבור חופשי</h2>
+    <p>הוראות: תגיד שעה, תאריך, ואת המספר <b>6869</b>.</p>
     
-    <!-- הכפתור המקורי של המערכת - היחיד שלא נחסם -->
-    <input type="file" id="videoInput" accept="video/*" capture="user">
-
-    <button id="finishBtn" class="btn-finish">סיימתי, שלח אישור לבוט</button>
-    <div id="status" style="margin-top: 15px; font-weight: bold; color: #0088cc;"></div>
+    <!-- הכפתור היחיד שפותח מצלמה ב-2026 בלי חסימות -->
+    <input type="file" accept="video/*" capture="user" id="v">
+    
+    <br><br>
+    <button id="s" style="display:none; padding:15px; background:green; color:white; width:100%;">סיימתי, שלח אישור</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+        const inp = document.getElementById('v');
+        const btn = document.getElementById('s');
 
-        const input = document.getElementById('videoInput');
-        const finishBtn = document.getElementById('finishBtn');
-        const status = document.getElementById('status');
-
-        input.onchange = function(e) {
-            if (input.files.length > 0) {
-                status.innerText = "הסרטון נטען בהצלחה!";
-                finishBtn.style.display = 'block';
-            }
-        };
-
-        finishBtn.onclick = function() {
-            tg.sendData("בוצע אימות וידאו 6869");
-            tg.close();
+        inp.onchange = () => { if(inp.files.length > 0) btn.style.display = 'block'; };
+        btn.onclick = () => { 
+            tg.sendData("בוצע אימות 6869"); 
+            tg.close(); 
         };
     </script>
 </body>
