@@ -3,54 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>אימות תמונה</title>
-    <!-- טעינת ה-SDK הרשמי של טלגרם -->
+    <title>אימות וידאו</title>
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .btn { background: #0088cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); line-height: 1.6; }
+        .instructions { background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px; text-align: right; margin-bottom: 20px; border: 1px solid #0088cc; }
+        .highlight { color: #0088cc; font-weight: bold; }
+        .btn { background: #0088cc; color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 18px; font-weight: bold; }
+        #status { margin-top: 20px; color: green; font-weight: bold; }
+        video { width: 100%; margin-top: 15px; border-radius: 10px; display: none; }
     </style>
 </head>
 <body>
-    <h1>אימות משתמש</h1>
-    <p>אנא צלם או העלה תמונה לאימות:</p>
+
+    <h2>שלב אימות הווידאו</h2>
     
-    <input type="file" id="imageInput" accept="image/*" style="display:none">
-    <button class="btn" onclick="document.getElementById('imageInput').click()">בחר תמונה</button>
-    
-    <div id="status" style="margin-top: 20px;"></div>
+    <div class="instructions">
+        <strong>הנחיות לאימות:</strong><br>
+        יש לשלוח סרטון עם <span class="highlight">פנים גלויות</span> בו אתה אומר:<br>
+        1. את <span class="highlight">השעה והתאריך</span> הנוכחיים.<br>
+        2. שהאימות מיועד ל<span class="highlight">קבוצת גייז דיבור חופשי</span>.<br>
+        3. יש להגיד את המספר: <span class="highlight">6869</span>.<br>
+        <br>
+        <strong>בהצלחה!</strong>
+    </div>
+
+    <!-- כפתור לבחירה/צילום וידאו -->
+    <input type="file" id="videoInput" accept="video/*" capture="user" style="display:none">
+    <button class="btn" onclick="document.getElementById('videoInput').click()">🎥 צלם או העלה סרטון</button>
+
+    <video id="videoPreview" controls></video>
+    <div id="status"></div>
 
     <script>
-        // אתחול ה-Mini App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // פתיחת החלון למסך מלא
+        tg.expand();
+        tg.ready();
 
-        document.getElementById('imageInput').onchange = async function(event) {
+        const videoInput = document.getElementById('videoInput');
+        const videoPreview = document.getElementById('videoPreview');
+        const status = document.getElementById('status');
+
+        videoInput.onchange = function(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (file) {
+                // הצגת הסרטון למשתמש כדי שיראה מה צילם
+                const fileURL = URL.createObjectURL(file);
+                videoPreview.src = fileURL;
+                videoPreview.style.display = 'block';
+                
+                status.innerText = "הווידאו נטען בהצלחה! שולח הודעה לבוט...";
 
-            document.getElementById('status').innerText = "שולח תמונה לאימות...";
-
-            // הכנת הנתונים לשליחה לשרת שלך
-            const formData = new FormData();
-            formData.append('photo', file);
-            formData.append('user_data', JSON.stringify(tg.initDataUnsafe)); // שליחת פרטי המשתמש מטלגרם
-
-            try {
-                // החלף את הכתובת בכתובת ה-Backend שלך
-                const response = await fetch('your-server.com', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    document.getElementById('status').innerText = "האימות הושלם!";
-                    setTimeout(() => tg.close(), 2000); // סגירת הבוט אחרי הצלחה
-                } else {
-                    document.getElementById('status').innerText = "שגיאה באימות.";
-                }
-            } catch (error) {
-                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
+                // שליחת מידע לבוט שהמשתמש סיים את הפעולה
+                setTimeout(() => {
+                    tg.sendData("המשתמש סיים לצלם וידאו לאימות");
+                    // הערה: ב-Mini App ללא שרת, הסרטון לא באמת נשלח לבוט כקובץ,
+                    // אלא רק נותן אישור שהמשתמש ביצע את הפעולה.
+                }, 3000);
             }
         };
     </script>
