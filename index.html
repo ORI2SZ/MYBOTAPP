@@ -5,52 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="telegram.org"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; }
-        .card { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 20px; }
-        .red { color: red; font-weight: bold; }
-        .btn { background: #0088cc; color: white; padding: 20px; border: none; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: white; color: #333; }
+        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 25px; line-height: 1.6; }
+        .red { color: #d32f2f; font-weight: bold; }
+        .btn-finish { background: #4CAF50; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; display: none; margin-top: 20px; }
+        input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px; background: #f9f9f9; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h3>אימות וידאו 6869</h3>
-        1. לחץ על הכפתור למטה.<br>
-        2. המצלמה תפתח - צלם סרטון סלפי.<br>
-        3. אמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
-        4. אמור את התאריך ואת המספר <span class="red">6869</span>.
+    <div class="instructions">
+        <strong>הנחיות לאימות:</strong><br>
+        יש לשלוח סרטון עם <span class="red">פנים גלויות</span> בו אתה אומר:<br>
+        1. את <span class="red">השעה והתאריך</span> הנוכחיים.<br>
+        2. שהאימות מיועד ל<span class="red">קבוצת גייז דיבור חופשי</span>.<br>
+        3. יש להגיד את המספר: <span class="red">6869</span>.<br>
+        <br>
+        <strong>בהצלחה!</strong>
     </div>
 
-    <!-- כפתור פשוט בלי input נסתר -->
-    <button class="btn" id="openCam">📸 פתח מצלמה לצילום</button>
+    <p>לחץ על הכפתור למטה ובחר ב"מצלמה":</p>
+    
+    <!-- הכפתור המקורי של המערכת - היחיד שלא נחסם -->
+    <input type="file" id="videoInput" accept="video/*" capture="user">
 
-    <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
+    <button id="finishBtn" class="btn-finish">סיימתי, שלח אישור לבוט</button>
+    <div id="status" style="margin-top: 15px; font-weight: bold; color: #0088cc;"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        document.getElementById('openCam').onclick = function() {
-            // ב-2026, חלק מהמכשירים דורשים שימוש ב-QR Scanner API כדי לעורר את המצלמה
-            // אבל אנחנו נשתמש בדרך הכי פשוטה שעוקפת חסימה:
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'video/*';
-            input.capture = 'user'; // פקודה ישירה למצלמה קדמית
-            
-            input.onchange = function(e) {
-                if (e.target.files.length > 0) {
-                    document.getElementById('status').innerText = "הווידאו נשמר! שולח אישור...";
-                    document.getElementById('status').style.color = "green";
-                    
-                    setTimeout(() => {
-                        tg.sendData("בוצע אימות וידאו 6869");
-                        tg.close();
-                    }, 2000);
-                }
-            };
-            
-            input.click(); // הפעלה ידנית ברגע הלחיצה
+        const input = document.getElementById('videoInput');
+        const finishBtn = document.getElementById('finishBtn');
+        const status = document.getElementById('status');
+
+        input.onchange = function(e) {
+            if (input.files.length > 0) {
+                status.innerText = "הסרטון נטען בהצלחה!";
+                finishBtn.style.display = 'block';
+            }
+        };
+
+        finishBtn.onclick = function() {
+            tg.sendData("בוצע אימות וידאו 6869");
+            tg.close();
         };
     </script>
 </body>
