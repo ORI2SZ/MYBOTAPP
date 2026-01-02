@@ -6,46 +6,28 @@
     <script src="telegram.org"></script>
     <style>
         body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .btn { padding: 15px; width: 100%; }
+        .instructions { border: 2px solid #0088cc; padding: 15px; border-radius: 12px; text-align: right; margin-bottom: 20px; line-height: 1.6; }
+        .red { color: red; font-weight: bold; }
+        .btn-finish { background: #28a745; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h3>אימות וידאו 6869</h3>
-    <input type="file" id="videoInput" accept="video/*" capture="user" style="display: none;">
-    <button class="btn" onclick="document.getElementById('videoInput').click()">📸 צלם או בחר סרטון</button>
-    <div id="status" style="margin-top: 15px;"></div>
-
+    <div class="instructions">
+        <b>הנחיות לאימות (חובה):</b><br>
+        1. צלם סרטון סלפי ואמור: <span class="red">"אימות לקבוצת גייז דיבור חופשי"</span>.<br>
+        2. ציין שעה, תאריך ואת המספר <span class="red">6869</span>.<br>
+        3. לחץ על "בחר קובץ" ובחר את הסרטון שצילמת.<br>
+        4. לחץ על הכפתור הירוק <b>"שלח אישור"</b>.
+    </div>
+    <input type="file" id="videoInput" accept="video/*" capture="user">
+    <button id="finishBtn" class="btn-finish">✅ שלח אישור לבוט</button>
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
-        document.getElementById('videoInput').onchange = async function(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            const file = files[0];
-            const formData = new FormData();
-            formData.append('video', file);
-            formData.append('user_id', tg.initDataUnsafe.user.id); // שליחת מזהה המשתמש
-
-            document.getElementById('status').innerText = "שולח סרטון לשרת...";
-
-            try {
-                // !!! החלף את הכתובת הבאה לכתובת השרת שלך !!!
-                const response = await fetch('your-server-url.com', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    document.getElementById('status').innerText = "הסרטון נשלח בהצלחה!";
-                    tg.close();
-                } else {
-                    document.getElementById('status').innerText = "שגיאה בשליחה.";
-                }
-            } catch (error) {
-                document.getElementById('status').innerText = "שגיאה בתקשורת עם השרת.";
-            }
+        document.getElementById('finishBtn').onclick = () => {
+            tg.sendData("בוצע אימות וידאו 6869");
+            tg.close();
         };
     </script>
 </body>
